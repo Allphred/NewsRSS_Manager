@@ -1,0 +1,23 @@
+/* Estructura vertical: header arriba, contenido flexible, footer abajo */
+.page { display: flex; flex-direction: column; min-height: 100vh; }
+
+.site-header { background: #171a26; }
+.header-inner {
+    display: flex; justify-content: space-between; align-items: center;
+    max-width: 1100px; margin: 0 auto; padding: .75rem 1rem; width: 100%;
+}
+.brand { display: flex; align-items: center; gap: .6rem; text-decoration: none; }
+.brand-logo { width: 36px; height: 36px; }
+.brand-name { color: #fff; font-size: 1.25rem; font-weight: 700; }
+.brand-accent { color: #ff7a18; }
+
+.site-main {
+    flex: 1; width: 100%; max-width: 1100px;
+    margin: 0 auto; padding: 1.5rem 1rem 3rem;
+}
+.site-footer { background: #171a26; color: rgba(255,255,255,.65); margin-top: auto; }
+.footer-inner {
+    max-width: 1100px; margin: 0 auto; padding: 1.25rem 1rem;
+    display: flex; justify-content: space-between; gap: 1rem;
+    flex-wrap: wrap; font-size: .9rem;
+}

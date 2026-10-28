@@ -1,0 +1,96 @@
+@* Formulario para crear una fuente, usando EditForm de Blazor. *@
+@inject IApiService Api
+
+<div class="add-feed-form card">
+    <div class="card-body">
+        <h3 class="form-title">Agregar una fuente</h3>
+
+        @* EditForm valida el Model antes de llamar a Enviar() *@
+        <EditForm Model="_form" OnValidSubmit="Enviar" class="row g-2 align-items-end">
+            <DataAnnotationsValidator />  @* activa las reglas [Required] de abajo *@
+
+            <div class="col-md-4">
+                <label class="form-label">Nombre</label>
+                @* @bind-Value: sincroniza el input con la propiedad C# en ambos sentidos *@
+                <InputText @bind-Value="_form.Nombre" class="form-control" placeholder="Hacker News" />
+                <ValidationMessage For="() => _form.Nombre" class="text-danger" />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">URL del RSS</label>
+                <InputText @bind-Value="_form.Url" class="form-control" placeholder="https://hnrss.org/frontpage" />
+                <ValidationMessage For="() => _form.Url" class="text-danger" />
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">Categoría</label>
+                <InputText @bind-Value="_form.Categoria" class="form-control" placeholder="Tech" />
+                <ValidationMessage For="() => _form.Categoria" class="text-danger" />
+            </div>
+
+            <div class="col-md-2">
+                @* disabled mientras el API responde (@( expresión ) en el atributo) *@
+                <button type="submit" class="btn btn-primary w-100" disabled="@_enviando">
+                    @(_enviando ? "Agregando…" : "Agregar")
+                </button>
+            </div>
+        </EditForm>
+
+        @* Si el API rechazó (categoría inválida, URL duplicada) se muestra el porqué *@
+        @if (!string.IsNullOrEmpty(_error))
+        {
+            <div class="alert alert-danger mt-2 mb-0 py-2">@_error</div>
+        }
+    </div>
+</div>
+
+@code {
+    // Evento que este componente EMITE hacia el padre cuando creó una fuente
+    [Parameter] public EventCallback OnFeedCreated { get; set; }
+
+    private bool _enviando;       // true mientras espera la respuesta
+    private string? _error;       // mensaje de error del API (si lo hay)
+
+    // Clase para el formulario: las reglas de validación viven aquí
+    private FormularioFeed _form = new();
+
+    // Se dispara al hacer submit (solo si pasó la validación)
+    private async Task Enviar()
+    {
+        _enviando = true;
+        _error = null;
+
+        // Armamos el Feed con lo escrito y llamamos al SERVICIO (no al HttpClient)
+        var feed = await Api.CreateFeedAsync(new Feed
+        {
+            Name = _form.Nombre,
+            Url = _form.Url,
+            Category = _form.Categoria
+        });
+
+        _enviando = false;
+
+        if (feed is null)
+        {
+            _error = Api.LastError ?? "No se pudo crear la fuente.";
+        }
+        else
+        {
+            _form = new FormularioFeed();      // limpiar el formulario
+            await OnFeedCreated.InvokeAsync(); // AVISAR AL PADRE (hijo → padre)
+        }
+    }
+
+    // Modelo del formulario con validación por atributos
+    private class FormularioFeed
+    {
+        [Required(ErrorMessage = "El nombre es obligatorio")]
+        public string Nombre { get; set; } = "";
+
+        [Required(ErrorMessage = "La URL es obligatoria")]
+        public string Url { get; set; } = "";
+
+        [Required(ErrorMessage = "La categoría es obligatoria")]
+        public string Categoria { get; set; } = "";
+    }
+}

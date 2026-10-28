@@ -1,0 +1,56 @@
+@* Barra de filtros: estado (nuevos/guardados/leídos/descartados/todos) + categoría.
+    Recibe el filtro actual por [Parameter] y, cuando el usuario cambia
+    un <select>, emite OnFilterChanged con un filtro NUEVO (hijo → padre). *@
+<div class="filter-bar card">
+    <div class="card-body d-flex gap-3 align-items-end flex-wrap">
+        <div>
+            <label class="form-label mb-1">Mostrar</label>
+            @* @onchange captura el cambio del select; value marca la opción actual *@
+            <select class="form-select" value="@Filtro.Status" @onchange="CambiarStatus">
+                <option value="new">Nuevos</option>
+                <option value="saved">Guardados</option>
+                <option value="read">Leídos</option>
+                <option value="discarded">Descartados</option>
+                <option value="all">Todos</option>
+            </select>
+        </div>
+        <div>
+            <label class="form-label mb-1">Categoría</label>
+            <select class="form-select" value="@CategoriaActual" @onchange="CambiarCategoria">
+                <option value="">Todas</option>
+                @foreach (var cat in Categorias)   @* opciones generadas con Razor *@
+                {
+                    <option value="@cat">@cat</option>
+                }
+            </select>
+        </div>
+    </div>
+</div>
+
+@code {
+    // Filtro actual  pasa el padre (para marcar las opciones seleccionadas)
+    [Parameter] public ArticleFilter Filtro { get; set; } = new();
+
+    // Evento hacia el padre cuando cambia algún filtro
+    [Parameter] public EventCallback<ArticleFilter> OnFilterChanged { get; set; }
+
+    // Las mismas categorías que acepta el API (definidas en su appsettings.json)
+    private static readonly string[] Categorias = { "Tech", "News", "Deportes", "Gaming", "General" };
+
+    // "" cuando no hay categoría (para el <select>)
+    private string CategoriaActual => Filtro.Category ?? "";
+
+    // e.Value trae el value de la <option> elegida
+    private async Task CambiarStatus(ChangeEventArgs e)
+    {
+        var nuevo = new ArticleFilter { Status = e.Value?.ToString() ?? "new", Category = Filtro.Category };
+        await OnFilterChanged.InvokeAsync(nuevo); // avisamos al padre
+    }
+
+    private async Task CambiarCategoria(ChangeEventArgs e)
+    {
+        var v = e.Value?.ToString();
+        var nuevo = new ArticleFilter { Status = Filtro.Status, Category = string.IsNullOrEmpty(v) ? null : v };
+        await OnFilterChanged.InvokeAsync(nuevo);
+    }
+}

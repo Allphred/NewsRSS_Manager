@@ -1,0 +1,54 @@
+@* Tarjetas con datos REALES del Web API. *@
+@inject IApiService Api
+
+@if (_cargando)
+{
+    @* Estado 1: mientras esperamos la respuesta del API *@
+    <div class="stats-grid">
+        <div class="stat-card"><span class="stat-value">…</span><span class="stat-label">Cargando</span></div>
+        <div class="stat-card"><span class="stat-value">…</span><span class="stat-label">Cargando</span></div>
+        <div class="stat-card"><span class="stat-value">…</span><span class="stat-label">Cargando</span></div>
+    </div>
+}
+else if (_feeds is null)
+{
+    @* Estado 2: el servicio devolvió null = el API no respondió *@
+    <div class="alert alert-danger mt-3">
+        No se pudo conectar al Web API. (Api.LastError: @Api.LastError)
+    </div>
+}
+else
+{
+    @* Estado 3: datos listos → la pantalla que "muestra información del API" *@
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-value">@_feeds.Count</span>
+            <span class="stat-label">Fuentes suscritas</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-value">@(_nuevos?.Count ?? 0)</span>
+            <span class="stat-label">Artículos nuevos</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-value">@(_guardados?.Count ?? 0)</span>
+            <span class="stat-label">Guardados</span>
+        </div>
+    </div>
+}
+
+@code {
+    // Campos privados del componente (su "estado")
+    private bool _cargando = true;
+    private List<Feed>? _feeds;
+    private List<Article>? _nuevos;
+    private List<Article>? _guardados;
+
+    // Se ejecuta UNA vez al crear el componente, antes del primer render.
+    protected override async Task OnInitializedAsync()
+    {
+        _feeds     = await Api.GetFeedsAsync();             // cuántas fuentes hay
+        _nuevos    = await Api.GetArticlesAsync("new", null);    // artículos no leídos
+        _guardados = await Api.GetArticlesAsync("saved", null);  // artículos guardados
+        _cargando = false; 
+    }
+}

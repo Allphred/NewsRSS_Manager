@@ -1,0 +1,102 @@
+@page "/articles"
+@inject IApiService Api
+
+<PageTitle>Artículos — RssAgregator</PageTitle>
+
+<h1 class="page-title">Artículos</h1>
+<p class="page-subtitle">Tu feed principal: filtra, lee en el original, guarda o descarta.</p>
+
+@if (_cargando)
+{
+    <div class="alert alert-secondary">Cargando artículos…</div>
+}
+else if (_articulos is null)
+{
+    <div class="alert alert-danger">No se pudo conectar al Web API (@Api.LastError)</div>
+}
+else
+{
+    @* COMPONENTE 1: barra de filtros. Cuando el usuario cambia algo,
+        el FilterBar  avisa con OnFilterChanged (hijo → padre) y
+         SE VUELVE a pedir la lista al servicio. *@
+    <FilterBar Filtro="_filtro" OnFilterChanged="AplicarFiltro" />
+
+    @if (_articulos.Count == 0)
+    {
+        <div class="alert alert-info mt-3">
+            No hay artículos con este filtro. Agrega fuentes y descarga artículos
+            desde la página "Mis fuentes".
+        </div>
+    }
+
+    @* COMPONENTE 2..N: una tarjeta por artículo *@
+    <div class="articles-list mt-3">
+        @foreach (var articulo in _articulos)
+        {
+            <ArticleCard Articulo="articulo"
+                         OnSave="Guardar"
+                         OnMarkRead="MarcarLeido"
+                         OnDiscard="Descartar" />
+        }
+    </div>
+}
+
+@code {
+    private bool _cargando = true;
+    private List<Article>? _articulos;
+    private ArticleFilter _filtro = new();   // arranca en status="new", categoría=null
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await CargarAsync();
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    // Pide al servicio los artículos según el filtro vigente
+    private async Task CargarAsync()
+    {
+        _articulos = await Api.GetArticlesAsync(_filtro.Status, _filtro.Category);
+    }
+
+    // Llega desde FilterBar con el filtro nuevo
+    private async Task AplicarFiltro(ArticleFilter nuevo)
+    {
+        _filtro = nuevo;
+        _cargando = true;
+        try
+        {
+            await CargarAsync();
+        }
+        finally
+        {
+            _cargando = false;
+        }
+    }
+
+    // Los tres métodos llegan desde los botones de ArticleCard
+
+    private async Task Guardar(Article a)
+    {
+        // Toggle: si estaba guardado lo quita, y viceversa
+        await Api.UpdateArticleFlagsAsync(a.Id, isRead: null, isSaved: !a.IsSaved, isDiscarded: null);
+        await CargarAsync(); // recargar: si SE QUITA un guardado de la vista "saved", desaparece
+    }
+
+    private async Task MarcarLeido(Article a)
+    {
+        await Api.UpdateArticleFlagsAsync(a.Id, isRead: true, isSaved: null, isDiscarded: null);
+        await CargarAsync(); // desaparece de la vista "new"
+    }
+
+    private async Task Descartar(Article a)
+    {
+        await Api.UpdateArticleFlagsAsync(a.Id, isRead: null, isSaved: null, isDiscarded: true);
+        await CargarAsync(); // se oculta de la pantalla principal
+    }
+}

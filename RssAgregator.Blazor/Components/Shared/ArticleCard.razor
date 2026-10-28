@@ -1,0 +1,69 @@
+@* Tarjeta de UN artículo: categoría + feed, fecha, título con enlace al
+    original, descripción desplegable y los 3 botones del MVP.
+    Todo lo que pasa aquí se avisa al padre con EventCallback. *@
+<article class="article-card @(Articulo.IsRead ? "article-read" : "")">
+    @* @(cond ? a : b) dentro del atributo: clase extra si ya está leído *@
+
+    <div class="article-header">
+        <div class="article-source">
+            <span class="badge">@Articulo.Feed?.Category</span>
+            <span class="article-feed">@Articulo.Feed?.Name</span>
+        </div>
+        <small class="article-date">
+            @Articulo.PublishedDate.ToLocalTime().ToString("dd MMM yyyy, HH:mm")
+        </small>
+    </div>
+
+    <h3 class="article-title">
+        @* target="_blank": abrir en pestaña nueva (ir al original, requisito del MVP) *@
+        <a href="@Articulo.Link" target="_blank" rel="noopener"
+           class="@(Articulo.IsRead ? "visited" : "")">
+            @Articulo.Title
+        </a>
+    </h3>
+
+    @* Descripción DESPLEGABLE: solo si el artículo tiene descripción *@
+    @if (!string.IsNullOrWhiteSpace(Articulo.Description))
+    {
+        <button class="btn-toggle" @onclick="ToggleDescripcion">
+            @(_abierto ? "Ocultar descripción" : "Ver descripción")
+        </button>
+
+        @if (_abierto)   @* se muestra solo cuando _abierto es true *@
+        {
+            @* Lo renderizamos como TEXTO: Blazor escapa el HTML del RSS por seguridad *@
+            <p class="article-description">@Articulo.Description</p>
+        }
+    }
+
+    <div class="article-actions">
+        <button class="btn btn-sm @(Articulo.IsSaved ? "btn-warning" : "btn-outline-warning")"
+                @onclick="NotificarGuardar">
+            @(Articulo.IsSaved ? "Guardado" : "Guardar")
+        </button>
+        <button class="btn btn-sm btn-outline-secondary" @onclick="NotificarLeido">
+            Marcar leído
+        </button>
+        <button class="btn btn-sm btn-outline-danger" @onclick="NotificarDescartar">
+            Descartar
+        </button>
+    </div>
+</article>
+
+@code {
+    // El artículo a mostrar, entregado por el padre
+    [Parameter] public Article Articulo { get; set; } = default!;
+
+    // Eventos hacia el padre (la tarjeta no llama al API: solo avisa)
+    [Parameter] public EventCallback<Article> OnSave { get; set; }
+    [Parameter] public EventCallback<Article> OnMarkRead { get; set; }
+    [Parameter] public EventCallback<Article> OnDiscard { get; set; }
+
+    private bool _abierto; // estado local: ¿se muestra la descripción?
+
+    private void ToggleDescripcion() => _abierto = !_abierto;
+
+    private Task NotificarGuardar()  => OnSave.InvokeAsync(Articulo);
+    private Task NotificarLeido()    => OnMarkRead.InvokeAsync(Articulo);
+    private Task NotificarDescartar() => OnDiscard.InvokeAsync(Articulo);
+}

@@ -1,0 +1,40 @@
+@* Tarjeta que muestra UNA fuente.
+    Feed entra por [Parameter] (padre → hijo).
+    Los botones emiten OnRefresh / OnDelete (hijo → padre) —
+    la tarjeta NO llama al API: solo avisa. El que decide es el padre. *@
+<div class="feed-card">
+    <div class="feed-header">
+        <h3 class="feed-name">@Feed.Name</h3>
+        <span class="badge">@Feed.Category</span>
+    </div>
+
+    <p class="feed-url">@Feed.Url</p>
+
+    <p class="feed-meta">
+        @* @( expresión ): última descarga o "nunca" si es null *@
+        Última descarga: @(Feed.LastFetchedAt?.ToLocalTime().ToString("g") ?? "nunca")
+    </p>
+
+    <div class="feed-actions">
+        @* @onclick conecta el clic del botón con un método C# *@
+        <button class="btn btn-sm btn-primary" @onclick="NotificarRefresh">
+            Descargar artículos
+        </button>
+        <button class="btn btn-sm btn-outline-danger" @onclick="NotificarEliminar">
+            Eliminar
+        </button>
+    </div>
+</div>
+
+@code {
+    // DATOS que el padre entrega a esta tarjeta
+    [Parameter] public Feed Feed { get; set; } = default!;
+
+    // EVENTOS que la tarjeta devuelve al padre
+    [Parameter] public EventCallback<Feed> OnRefresh { get; set; }
+    [Parameter] public EventCallback<Feed> OnDelete { get; set; }
+
+    // InvokeAsync dispara el evento hacia el padre pasándole el feed
+    private Task NotificarRefresh() => OnRefresh.InvokeAsync(Feed);
+    private Task NotificarEliminar() => OnDelete.InvokeAsync(Feed);
+}

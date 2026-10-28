@@ -1,0 +1,84 @@
+@page "/feeds"
+@inject IApiService Api
+
+<PageTitle>Mis fuentes — RssAgregator</PageTitle>
+
+<h1 class="page-title">Mis fuentes</h1>
+<p class="page-subtitle">Administra los feeds RSS a los que estás suscrito.</p>
+
+@if (_cargando)
+{
+    <div class="alert alert-secondary">Cargando fuentes…</div>
+}
+else if (_feeds is null)
+{
+    <div class="alert alert-danger">No se pudo conectar al Web API (@Api.LastError)</div>
+}
+else
+{
+    @* COMPONENTE 1: formulario para agregar fuentes. *@
+    <AddFeedForm OnFeedCreated="RecargarLista" />
+
+    @* COMPONENTE 2..N: una tarjeta por fuente (FeedCard). *@
+    <div class="feeds-grid">
+        @foreach (var feed in _feeds)  
+        {
+            <FeedCard Feed="feed"
+                      OnDelete="EliminarFeed"
+                      OnRefresh="RefrescarFeed" />
+        }
+    </div>
+
+    @if (_feeds.Count == 0)
+    {
+        <div class="alert alert-info">Aún no tienes fuentes. Agrega la primera arriba.</div>
+    }
+}
+
+@if (!string.IsNullOrEmpty(_mensaje))
+{
+    <div class="alert alert-info mt-3">@_mensaje</div>
+}
+
+@code {
+    private bool _cargando = true;
+    private List<Feed>? _feeds;
+    private string _mensaje = "";   // feedback para el usuario (ej: "3 artículos nuevos")
+
+    protected override async Task OnInitializedAsync()
+    {
+        _feeds = await Api.GetFeedsAsync();
+        _cargando = false;
+    }
+
+    // Llega desde AddFeedForm (EventCallback sin argumento)
+    private async Task RecargarLista()
+    {
+        _feeds = await Api.GetFeedsAsync();
+        _mensaje = "Fuente agregada correctamente.";
+    }
+
+    // Llega desde FeedCard con el feed a borrar (EventCallback<Feed>)
+    private async Task EliminarFeed(Feed feed)
+    {
+        if (await Api.DeleteFeedAsync(feed.Id))
+        {
+            _feeds = await Api.GetFeedsAsync(); // recargar sin el feed borrado
+            _mensaje = $"Fuente '{feed.Name}' eliminada (junto con sus artículos).";
+        }
+        else
+        {
+            _mensaje = Api.LastError ?? "Error al eliminar la fuente.";
+        }
+    }
+
+    // Llega desde FeedCard: pedir al API que descargue artículos nuevos
+    private async Task RefrescarFeed(Feed feed)
+    {
+        _mensaje = $"Descargando artículos de '{feed.Name}'…";
+        var nuevos = await Api.RefreshFeedAsync(feed.Id);
+        _mensaje = nuevos >= 0
+            ? $"'{feed.Name}': {nuevos} artículos nuevos descargados."
+            : Api.LastError ?? "Error al refrescar la fuente.";
+    }
+}

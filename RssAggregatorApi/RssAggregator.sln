@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RssAgregator.Api", "RssAgregator.Api\RssAgregator.Api.csproj", "{FA6B737B-1F06-4523-8FE3-6AD29BFAEEAF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RssAgregator.Blazor", "..\RssAgregator.Blazor\RssAgregator.Blazor.csproj", "{ADDBFB00-C675-4CB3-8992-0C6F40654894}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{FA6B737B-1F06-4523-8FE3-6AD29BFAEEAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA6B737B-1F06-4523-8FE3-6AD29BFAEEAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA6B737B-1F06-4523-8FE3-6AD29BFAEEAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADDBFB00-C675-4CB3-8992-0C6F40654894}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADDBFB00-C675-4CB3-8992-0C6F40654894}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADDBFB00-C675-4CB3-8992-0C6F40654894}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADDBFB00-C675-4CB3-8992-0C6F40654894}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

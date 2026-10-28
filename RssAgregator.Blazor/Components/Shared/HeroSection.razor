@@ -1,0 +1,20 @@
+@* Sección de presentación de la landing (banner principal).
+     solo muestra lo que recibe. *@
+
+
+<section class="hero">
+    <div class="hero-content">
+        <img src="images/logo.svg" alt="" class="hero-logo" />
+        <h1>@Title</h1>              @* aquí se imprime el parámetro *@
+        <p class="hero-subtitle">@Subtitle</p>
+        <div class="hero-actions">
+            <a class="btn btn-primary btn-lg" href="feeds">Gestionar fuentes</a>
+            <a class="btn btn-outline-light btn-lg" href="articles">Ver artículos</a>
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public string Subtitle { get; set; } = string.Empty;
+}
