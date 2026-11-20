@@ -2,28 +2,30 @@
 @* LayoutComponentBase: esta plantilla envuelve TODAS las páginas;
    el contenido de cada una se renderiza donde está @Body. *@
 
-@* ===== HEADER ===== *@
-<header class="site-header">
-    <div class="header-inner">
-        <a class="brand" href="">
-            <img src="images/logo.svg" alt="Logo de RssAgregator" class="brand-logo" />
-            <span class="brand-name">Rss<span class="brand-accent">Agregator</span></span>
-        </a>
-        <NavMenu /> @* rutilizacion del componente de menú *@
-    </div>
-</header>
+<div class="page">
+    @* ===== HEADER ===== *@
+    <header class="site-header">
+        <div class="header-inner">
+            <a class="brand" href="">
+                <img src="images/logo.svg" alt="Logo de RssAgregator" class="brand-logo" />
+                <span class="brand-name">Rss<span class="brand-accent">Agregator</span></span>
+            </a>
+            <NavMenu /> @* reutilización del componente de menú *@
+        </div>
+    </header>
 
-@* ===== CONTENIDO ===== *@
-<main class="site-main">
-    @Body
-</main>
+    @* ===== CONTENIDO ===== *@
+    <main class="site-main">
+        @Body
+    </main>
 
-@* ===== FOOTER  ===== *@
-<footer class="site-footer">
-    <div class="footer-inner">
-        <div><strong>RssAgregator</strong> — Todas tus noticias en un solo lugar</div>
-    </div>
-</footer>
+    @* ===== FOOTER ===== *@
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div><strong>RssAgregator</strong> — Todas tus noticias en un solo lugar</div>
+        </div>
+    </footer>
+</div>
 
 @* UI de errores de Blazor  *@
 <div id="blazor-error-ui">

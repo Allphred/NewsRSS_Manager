@@ -23,6 +23,14 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Registra el servicio RSS con ciclo de vida scoped: una instancia por solicitud.
 builder.Services.AddScoped<IRssService, RssService>();
 
+// [CAMBIO 1 DE 2] CORS: permite que el frontend React (http://localhost:5173) llame a esta API.
+// Sin esto, el navegador bloquea las peticiones entre orígenes distintos (puertos diferentes).
+builder.Services.AddCors(options =>
+    options.AddPolicy("Frontend", policy => policy
+        .WithOrigins("http://localhost:5173")
+        .AllowAnyHeader()
+        .AllowAnyMethod()));
+
 // Construye la aplicación con los servicios y la configuración registrados.
 var app = builder.Build();
 
@@ -36,6 +44,9 @@ if (app.Environment.IsDevelopment())
 // Redirige las solicitudes HTTP a HTTPS cuando se habilite esta configuración.
 //app.UseHttpsRedirection();
 
+// [CAMBIO 2 DE 2] Activa la política CORS 
+app.UseCors("Frontend");
+
 // Activa el middleware de autorización cuando se configure la autenticación.
 //app.UseAuthorization();
 
@@ -44,5 +55,3 @@ app.MapControllers();
 
 // Inicia el servidor web y mantiene la aplicación atendiendo solicitudes.
 app.Run();
-
-

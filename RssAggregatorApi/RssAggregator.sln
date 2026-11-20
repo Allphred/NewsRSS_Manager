@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RssAgregator.Api", "RssAgregator.Api\RssAgregator.Api.csproj", "{FA6B737B-1F06-4523-8FE3-6AD29BFAEEAF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RssAgregator.Blazor", "..\RssAgregator.Blazor\RssAgregator.Blazor.csproj", "{ADDBFB00-C675-4CB3-8992-0C6F40654894}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RssAgregator.Web", "..\RssAgregator.Web\RssAgregator.Web.csproj", "{ADDBFB00-C675-4CB3-8992-0C6F40654894}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
