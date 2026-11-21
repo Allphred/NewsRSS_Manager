@@ -20,8 +20,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Registra el servicio RSS con ciclo de vida scoped: una instancia por solicitud.
-builder.Services.AddScoped<IRssService, RssService>();
+// Registra el servicio RSS con HttpClient para descargar los feeds.
+builder.Services.AddHttpClient<IRssService, RssService>();
 
 // [CAMBIO 1 DE 2] CORS: permite que el frontend React (http://localhost:5173) llame a esta API.
 // Sin esto, el navegador bloquea las peticiones entre orígenes distintos (puertos diferentes).

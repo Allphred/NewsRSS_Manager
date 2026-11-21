@@ -24,7 +24,13 @@
 
             <div class="col-md-2">
                 <label class="form-label">Categoría</label>
-                <InputText @bind-Value="_form.Categoria" class="form-control" placeholder="Tech" />
+                <InputSelect @bind-Value="_form.Categoria" class="form-select">
+                    <option value="">Selecciona una categoría</option>
+                    @foreach (var categoria in FeedCategories.All)
+                    {
+                        <option value="@categoria">@categoria</option>
+                    }
+                </InputSelect>
                 <ValidationMessage For="() => _form.Categoria" class="text-danger" />
             </div>
 

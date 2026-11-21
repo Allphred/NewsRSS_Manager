@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App.jsx';
 import './styles/global.css';
 
-// Punto de entrada: dibuja <App /> dentro del <div id="root"> de index.html.
+// dibuja <App /> index.html.
 // BrowserRouter activa la navegación entre páginas sin recargar el navegador.
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

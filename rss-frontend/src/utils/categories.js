@@ -1,0 +1,15 @@
+export const FEED_CATEGORIES = [
+  'Tech',
+  'News',
+  'Deportes',
+  'Gaming',
+  'General',
+  'Educación',
+  'Espacio',
+  'Océano',
+  'Filosofía',
+  'Naturaleza',
+  'Psicología',
+  'Exploración',
+  'Humor',
+];

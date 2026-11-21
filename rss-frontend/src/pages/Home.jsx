@@ -6,6 +6,7 @@ import Section from '../components/Section';
 import FilterBar from '../components/FilterBar';
 import ArticleList from '../components/ArticleList';
 import StatusMessage from '../components/StatusMessage';
+import { FEED_CATEGORIES } from '../utils/categories';
 
 /** Landing page: banner + noticias nuevas con filtros por categoría y fuente. */
 function Home() {
@@ -30,7 +31,7 @@ function Home() {
       .finally(() => setLoading(false));
   }, [category]);
 
-  const categories = [...new Set(feeds.map((f) => f.category))];
+  const categories = FEED_CATEGORIES;
   // La API no filtra por fuente, por eso este filtro
   const visible = feedId ? articles.filter((a) => a.feedId === Number(feedId)) : articles;
 

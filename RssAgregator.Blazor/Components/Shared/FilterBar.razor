@@ -18,7 +18,7 @@
             <label class="form-label mb-1">Categoría</label>
             <select class="form-select" value="@CategoriaActual" @onchange="CambiarCategoria">
                 <option value="">Todas</option>
-                @foreach (var cat in Categorias)   @* opciones generadas con Razor *@
+                @foreach (var cat in FeedCategories.All)   @* opciones generadas con Razor *@
                 {
                     <option value="@cat">@cat</option>
                 }
@@ -33,9 +33,6 @@
 
     // Evento hacia el padre cuando cambia algún filtro
     [Parameter] public EventCallback<ArticleFilter> OnFilterChanged { get; set; }
-
-    // Las mismas categorías que acepta el API (definidas en su appsettings.json)
-    private static readonly string[] Categorias = { "Tech", "News", "Deportes", "Gaming", "General" };
 
     // "" cuando no hay categoría (para el <select>)
     private string CategoriaActual => Filtro.Category ?? "";

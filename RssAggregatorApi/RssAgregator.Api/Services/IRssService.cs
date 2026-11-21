@@ -16,13 +16,18 @@ public interface IRssService
 public class RssService : IRssService
 {
     private readonly AppDbContext _db;
-
+    private readonly HttpClient _http;
     private readonly ILogger<RssService> _logger;
 
-    public RssService(AppDbContext db, ILogger<RssService> logger)
+    public RssService(AppDbContext db, HttpClient http, ILogger<RssService> logger)
     {
         _db = db;
+        _http = http;
         _logger = logger;
+
+        _http.DefaultRequestHeaders.UserAgent.ParseAdd("RssAgregator/1.0");
+        _http.DefaultRequestHeaders.Accept.ParseAdd("application/rss+xml");
+        _http.DefaultRequestHeaders.Accept.ParseAdd("application/xml");
     }
 
     public async Task<int> FetchArticlesAsync(int feedId)
@@ -35,9 +40,13 @@ public class RssService : IRssService
             return -1;
         }
 
-        // Descarga y lee el RSS.
-        using var reader = XmlReader.Create(feed.Url);
-        var rss = SyndicationFeed.Load(reader);
+        // Descarga el RSS con un User-Agent identificable y lee el XML de la respuesta.
+        using var response = await _http.GetAsync(feed.Url, HttpCompletionOption.ResponseHeadersRead);
+        response.EnsureSuccessStatusCode();
+        await using var stream = await response.Content.ReadAsStreamAsync();
+        using var reader = XmlReader.Create(stream);
+        var rss = SyndicationFeed.Load(reader)
+              ?? throw new InvalidDataException("La respuesta no contiene un feed RSS válido.");
 
         var nuevos = 0;
         foreach (var item in rss.Items)

@@ -8,7 +8,7 @@ import Footer from '../components/Footer';
 function MainLayout({ children }) {
   return (
     <>
-      <Header title="El Compendio" tagline="Tus fuentes, tu portada" />
+      <Header title="El Compendio" tagline="LA INFORMACIÓN ESENCIAL Y SELECCIONADA POR Y PARA TI" />
       <NavBar />
       <main className="container">{children}</main>
       <Footer />

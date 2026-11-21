@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { FEED_CATEGORIES } from '../utils/categories';
 
 /**
  * Formulario para agregar una fuente (inputs controlados).
@@ -31,7 +32,12 @@ function FeedForm({ onSubmit }) {
     <form className="feed-form" onSubmit={handleSubmit}>
       <input name="name" placeholder="Nombre (ej. BBC Mundo)" value={form.name} onChange={handleChange} required />
       <input name="url" type="url" placeholder="URL del RSS" value={form.url} onChange={handleChange} required />
-      <input name="category" placeholder="Categoría" value={form.category} onChange={handleChange} required />
+      <select name="category" value={form.category} onChange={handleChange} required aria-label="Categoría">
+        <option value="" disabled>Selecciona una categoría</option>
+        {FEED_CATEGORIES.map((category) => (
+          <option key={category} value={category}>{category}</option>
+        ))}
+      </select>
       <button type="submit" disabled={sending}>{sending ? 'Agregando…' : 'Agregar fuente'}</button>
       {error && <p className="status error">{error}</p>}
     </form>
